@@ -1,6 +1,222 @@
-<!DOCTYPE html>
-<html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!-- saved from url=(0034)https://mannequin-depth.github.io/ -->
+<script src="https://cdn.jsdelivr.net/npm/@alch/alchemy-web3@latest/dist/alchemyWeb3.min.js"></script>
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link href="./misc_files/style.css" rel="stylesheet" type="text/css">
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-KPVR5NKSTV"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-KPVR5NKSTV');
+</script>
+</head>
 <body>
-<h1>HelloWorld</h1>
+
+<!-- Header -->
+<div class="container" style="height:600px; width:600px; color: #eee">
+    <img class="squiggle" src="./misc_files/squiggle1.svg" id="squiggy1" style="width:85%; transform: translate(-53%, -50%);"/>
+    <div class="centered" style="width:300px">
+      <p><span class="title">Welcome to the NFT Library of Babel</span></p>
+      <p align="center">
+        <br>
+        <b>What do you want to link yourself to?</b>
+        <br><br>
+        It's all here -- every object, activity, place, concept, feeling, creation.
+        Anyone can mint, but there can only be one owner for each hash.
+        With nearly as many tokens as atoms in the universe, there's room for everyone.
+      </p>
+    </div>
+</div>
+<!-- Minting factory -->
+<div style="width:600px; height:600px" align="center" class="container">
+  <p>&nbsp;</p>
+  <p align="center"><input type="text" id="text_entry" placeholder="Text"></input></p>
+  <p align="center"><input type="checkbox" id="alreadyHashed">Already hashed?</p>
+  <p align="center"><button onclick="onCheckTextField()">Check token status</button></p>
+  <div id="tokenIDs"><br><br></div>
+  <div align="center" style="margin:0 auto;width: 90%%">
+    <div style="float:left; width: 250px; height: 400px; margin: 0 auto; transform: translate(40%, 0);" id="minted">
+      <img src="./misc_files/arrowdl.svg" id="lefty" style="width:70%"/>
+      <div id="minted_text"> </div>
+    </div>
+    <div style="float:right; width: 250px; height: 400px; margin: 0 auto" id="unminted">
+      <img src="./misc_files/arrowdr.svg" id="righty" style="width:70%; transform: translate(-50%, 0);"/>
+      <div id="unminted_text"> </div>
+      <p align="center"><button type="button" id="walletConnectButton" style="visibility:hidden;" onclick="connectWallet()">Connect wallet?</button></p>
+      <p align="center"><button type="button" id="mintNFTButton" style="visibility:hidden;" onclick="mintTheNFT()">Mint NFT?</button></p>
+    </div>
+  </div>
+</div>
+<div class="spacer"></div>
+
+<!-- FAQs -->
+<div class="container" style="width:600px; color: #bbb">
+    <div align="center" style="width:500px; margin: 0 auto">
+      <p><span class="title">What's going on here?</span></p>
+      <p><b>Hey, where's my jpeg?</b></p>
+      <p>This NFT is as minimal as you can get.  There is no associated metadata, no bells or whistles.  The token ID is etched into the Ethereum blockchain with your "name" beside it, and that's all you get.</p>
+      <p><b>I can mint this NFT myself?? and it's free?? How?</b></p>
+      <p>To make the minting transaction, you must have an Ethereum wallet like <a href="https://metamask.io/">MetaMask</a>.  It's really easy to use -- just a browser extension that handles the signing of transactions on your behalf.  While anyone can mint and it's completely unrestricted, there is an unavoidable fee when making a change of state to the Ethereum blockchain.  This means you also need some ETH in the wallet.  Minting a few of these NFTs ourselves cost around $5-40 each (it's variable, depending on the instantaneous demands on the network).  Metamask will give you an estimate of the processing fee before you confirm, and then it should just take around a minute to get the confirmation.</p>
+      <p><b>Wait so what do I own?</b></p>
+      <p>You own a link to a numeric value.  That value is a unique identifier for whatever it is you hashed.  If you own the identifier for the phrase "pepperoni pizza", you will be the only person on Earth with the link to "pepperoni pizza".
+      You and everyone else can see the record of this on <a href="https://etherscan.io/token/0x734b03a053c1153c4A77E80911C00ecE3c3D163E">Etherscan</a> (you can also search for your wallet address, or the contract address below). You can list it on an NFT auction place like <a href="https://opensea.io/collection/babelnft">OpenSea</a>, though currently (without metadata attached to these tokens) it's a little barebones.</p>
+      <p><b>How is the tokenID produced?</b></p>
+      <p>We use SHA-256 to hash (i.e. turn any input into a stupidly large, 256-bit number).  This means of serialization is commonly used to prove identity, because two distinct inputs will statistically never have the same hash (e.g. when file integrity is verified by checksum).  You can check the hash value on a variety of other websites; <b>the value in using this hash is that it is a universally agreed upon standard.</b>  It doesn't matter who hashes "New York City", you will always get <code><mark>0x5a59ef2e40c5f89adb8c0c6ad0a8019b0e252fff530cf2ee822880eac13599c3</mark></code>. <br>
+      <b>You and everyone else can verify that the token matches the input, but there is no way backward from the tokenID to the original input if it's forgotten. It's on you to keep track of your inputs, so that the tokens are more than meaningless strings of numbers.</b></p>
+      <p><b>What should I know about the possible inputs?</b></p>
+      <p>SHA-256 can encode inputs much longer than 256 bits, meaning the entire works of Shakespeare can be hashed down to a single 256-bit identifier.  We don't recommend pasting the whole text in this webpage, however; you can hash whatever you want elsewhere, and check the "Already hashed?" box to indicate you want the ID as is.  Do so at your own risk; poorly formatted entries will throw errors.  Also it is important to note that "love", "Love", and "LOVE" will all produce different hashes, and will therefore correspond to different tokens.  SHA-256 works on byte streams, ultimately strings are turned into bytes through UTF-8.  Non-latin characters like €, 어이, and 🔥 are also fair game, as they have a universally agreed upon representation in bytes.</p>
+      <p><b>Library of Babel...?</b></p>
+      <p>A ridiculously cool idea of Jorge Luis Borges of a fictional library which contains every possible book up to 410 pages long, by having one book per distinct combination of letters and punctuation.  While the vast majority of the library is utter nonsense, lying in its shelves are also every book written and every book that will ever be written (within the page limit).  These NFTs are similar: there are 2<sup>256</sup>≈10<sup>77</sup> possible tokens to be minted, nearly as many as the estimated number of atoms in the universe (~10<sup>82</sup>).  The vast, vast majority will never be mined, and correspond to nothing interesting.  But within the space of all of these tokens, there is a unique link to every person and place that has ever existed, to every word in every language, and maybe even to every unique sentence that has ever been uttered? </p>
+      <p><b>Contract address</b></p>
+      <p><code><mark>0x734b03a053c1153c4A77E80911C00ecE3c3D163E</code></mark></p>
+      <p></p>
+    </div>
+</div>
+<!-- <div style="clear: both;"></div> -->
+<div align="center" class="centered2" style="height:200px;width:200px;">
+  <img src="./misc_files/babelNFT.gif" style="width:70%"/>
+</div>
+<script type="text/javascript">
+
+let textField;
+let hashedTextField;
+let publicKey;
+let walletConnected = false;
+let myContract;
+
+const contractAddress = "0x734b03a053c1153c4A77E80911C00ecE3c3D163E";
+const contractABI = [{"inputs": [],"stateMutability": "nonpayable","type": "constructor"},{"anonymous": false,"inputs": [{"indexed": true,"internalType": "address","name": "owner","type": "address"},{"indexed": true,"internalType": "address","name": "approved","type": "address"},{"indexed": true,"internalType": "uint256","name": "tokenId","type": "uint256"}],"name": "Approval","type": "event"},{"anonymous": false,"inputs": [{"indexed": true,"internalType": "address","name": "owner","type": "address"},{"indexed": true,"internalType": "address","name": "operator","type": "address"},{"indexed": false,"internalType": "bool","name": "approved","type": "bool"}],"name": "ApprovalForAll","type": "event"},{"anonymous": false,"inputs": [{"indexed": true,"internalType": "address","name": "from","type": "address"},{"indexed": true,"internalType": "address","name": "to","type": "address"},{"indexed": true,"internalType": "uint256","name": "tokenId","type": "uint256"}],"name": "Transfer","type": "event"},{"inputs": [{"internalType": "address","name": "to","type": "address"},{"internalType": "uint256","name": "tokenId","type": "uint256"}],"name": "approve","outputs": [],"stateMutability": "nonpayable","type": "function"},{"inputs": [{"internalType": "address","name": "owner","type": "address"}],"name": "balanceOf","outputs": [{"internalType": "uint256","name": "","type": "uint256"}],"stateMutability": "view","type": "function"},{"inputs": [{"internalType": "uint256","name": "tokenId","type": "uint256"}],"name": "getApproved","outputs": [{"internalType": "address","name": "","type": "address"}],"stateMutability": "view","type": "function"},{"inputs": [{"internalType": "address","name": "owner","type": "address"},{"internalType": "address","name": "operator","type": "address"}],"name": "isApprovedForAll","outputs": [{"internalType": "bool","name": "","type": "bool"}],"stateMutability": "view","type": "function"},{"inputs": [{"internalType": "address","name": "recipient","type": "address"},{"internalType": "bytes32","name": "b32hash","type": "bytes32"}],"name": "mintNFT","outputs": [{"internalType": "uint256","name": "","type": "uint256"}],"stateMutability": "nonpayable","type": "function"},{"inputs": [],"name": "name","outputs": [{"internalType": "string","name": "","type": "string"}],"stateMutability": "view","type": "function"},{"inputs": [{"internalType": "uint256","name": "tokenId","type": "uint256"}],"name": "ownerOf","outputs": [{"internalType": "address","name": "","type": "address"}],"stateMutability": "view","type": "function"},{"inputs": [{"internalType": "address","name": "from","type": "address"},{"internalType": "address","name": "to","type": "address"},{"internalType": "uint256","name": "tokenId","type": "uint256"}],"name": "safeTransferFrom","outputs": [],"stateMutability": "nonpayable","type": "function"},{"inputs": [{"internalType": "address","name": "from","type": "address"},{"internalType": "address","name": "to","type": "address"},{"internalType": "uint256","name": "tokenId","type": "uint256"},{"internalType": "bytes","name": "_data","type": "bytes"}],"name": "safeTransferFrom","outputs": [],"stateMutability": "nonpayable","type": "function"},{"inputs": [{"internalType": "address","name": "operator","type": "address"},{"internalType": "bool","name": "approved","type": "bool"}],"name": "setApprovalForAll","outputs": [],"stateMutability": "nonpayable","type": "function"},{"inputs": [{"internalType": "bytes4","name": "interfaceId","type": "bytes4"}],"name": "supportsInterface","outputs": [{"internalType": "bool","name": "","type": "bool"}],"stateMutability": "view","type": "function"},{"inputs": [],"name": "symbol","outputs": [{"internalType": "string","name": "","type": "string"}],"stateMutability": "view","type": "function"},{"inputs": [{"internalType": "uint256","name": "tokenId","type": "uint256"}],"name": "tokenURI","outputs": [{"internalType": "string","name": "","type": "string"}],"stateMutability": "view","type": "function"},{"inputs": [{"internalType": "address","name": "from","type": "address"},{"internalType": "address","name": "to","type": "address"},{"internalType": "uint256","name": "tokenId","type": "uint256"}],"name": "transferFrom","outputs": [],"stateMutability": "nonpayable","type": "function"
+    }
+  ],
+
+API_URL = "https://eth-mainnet.alchemyapi.io/v2/aNuJmwSx78k2fZoMSPQB5lZ90jmGBhgc";
+const web3 = AlchemyWeb3.createAlchemyWeb3(API_URL)
+myContract = new web3.eth.Contract(contractABI, contractAddress);
+
+
+async function connectWallet () {
+  if (typeof window.ethereum !== 'undefined') { //check if Metamask is installed
+    try {
+        console.log(publicKey);
+        const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+        publicKey = accounts[0];
+        console.log(publicKey);
+        walletConnected = true;
+        document.getElementById("walletConnectButton").style.visibility = "hidden";
+        document.getElementById("mintNFTButton").style.visibility = "visible";
+      } catch (error) {
+        walletConnected = false;
+        window.alert("🦊 Connect to Metamask using the button on the top right.");
+      }
+    } else {
+    walletConnected = false;
+    window.alert("🦊 You must install Metamask into your browser: https://metamask.io/download.html");
+  }
+}
+
+async function requestApproval() {
+  //Will Start the metamask extension
+  connectWallet();
+  if (walletConnected) {
+    const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+    if (accounts.length > 0) {
+      publicKey = accounts[0];
+      document.getElementById("walletConnectButton").style.visibility = "hidden";
+      document.getElementById("mintNFTButton").style.visibility = "visible";
+      walletConnected = true;
+  } else {
+    window.alert("Error connecting wallet")
+  }
+  }
+}
+
+async function hashMessage() { // Prefer hashing here to save on gas
+  const encoder = new TextEncoder();
+  const data = encoder.encode(textField);
+  const hash = await crypto.subtle.digest('SHA-256', data);
+  hashedTextField = hex(hash);
+}
+const byteToHex = [];
+
+for (let n = 0; n <= 0xff; ++n)
+{
+    const hexOctet = n.toString(16).padStart(2, "0");
+    byteToHex.push(hexOctet);
+}
+
+function hex(arrayBuffer) {
+    const buff = new Uint8Array(arrayBuffer);
+    const hexOctets = []; // new Array(buff.length) is even faster (preallocates necessary array size), then use hexOctets[i] instead of .push()
+
+    for (let i = 0; i < buff.length; ++i)
+        hexOctets.push(byteToHex[buff[i]]);
+
+    return "0x"+hexOctets.join("");
+}
+
+function mintTheNFT() {
+  const data = myContract.methods.mintNFT(publicKey, hashedTextField).encodeABI();
+  const tx = {
+   'from': publicKey,
+   'to': contractAddress,
+   // 'nonce': nonce,
+   // 'gas': 500000,
+   'data': data,
+  };
+  console.log("Data", data);
+
+  const txHash = ethereum.request({method: 'eth_sendTransaction', params: [tx]}).then((hash) => {
+    console.log("The hash of your transaction is: ", hash);
+  }).catch((err) => {
+      console.log("Something went wrong when submitting your transaction:", err);
+    })
+}
+
+async function onCheckTextField() {
+
+  textField = document.getElementById("text_entry").value;
+  console.log(textField);
+  if (document.getElementById("alreadyHashed").checked) {
+    hashedTextField = textField;
+  } else {
+    await hashMessage();
+  }
+  hashedTextField = '0x' + web3.utils.padLeft(hashedTextField.replace('0x', ''), 64);
+  document.getElementById("tokenIDs").innerHTML = "Token ID: <code><mark>"+hashedTextField+"</code></mark>";
+  console.log(hashedTextField);
+  try {
+    myContract.methods.ownerOf(hashedTextField).call().then((thing) => {
+      // It's already owned: display the owner
+      document.getElementById("lefty").style.filter = "invert(0.9)";
+      document.getElementById("righty").style.filter = "";
+      document.getElementById("minted_text").innerHTML = "Already minted!  Belongs to: <br> <code><mark>"+thing+"</mark></code>";
+      document.getElementById("unminted_text").innerHTML = "";
+      document.getElementById("walletConnectButton").style.visibility = "hidden";
+      document.getElementById("mintNFTButton").style.visibility = "hidden";
+    }).catch(error => {
+      console.log(error.message);
+      if (error.message.includes("nonexistent token")) {
+        // Unminted, display option to buy
+        document.getElementById("lefty").style.filter = "";
+        document.getElementById("righty").style.filter = "invert(0.9)";
+        document.getElementById("unminted_text").innerHTML = "Token has not been minted yet! <br> Would you like to mint it?";
+        document.getElementById("minted_text").innerHTML = "";
+        if (!walletConnected) {
+          document.getElementById("walletConnectButton").style.visibility = "visible";
+        } else {
+          document.getElementById("mintNFTButton").style.visibility = "visible";
+        }
+      } else {
+        window.alert("Bad query: "+error.message);
+      }
+    })
+  } catch(e) {
+    window.alert("Really bad query: "+e.message);
+    console.log(e.message);
+  }}
+
+</script>
 </body>
 </html>
