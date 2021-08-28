@@ -188,7 +188,7 @@ function mintTheNFT() {
 async function onCheckTextField() {
   textField = document.getElementById("text_entry").value;
   console.log(textField);
-  if (document.getElementById("rawID").checked) {
+  if (document.getElementById("rawValue").checked) {
     if (textField.slice(0, 2) == '0x') { // interpret as hex
       tokenID = textField;
     } else { // interpret as decimal
