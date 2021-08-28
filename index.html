@@ -73,12 +73,23 @@
       <p></p>
     </div>
 </div>
-<div style="width:600px; height:600px" align="center" class="container">
-  <p>Advanced Features</p>
-  <p align="center"><input type="checkbox" id="shouldIHash">Perform hash?</p>
-  <p align="center"><input type="checkbox" id="rawID">Raw ID value?</p>
+<div style="width:600px;" align="center" class="container">
+  <div align="center">
+    <br>
+    <p align="center" style="font-size: 24px">Turn a token ID back into the characters it represents</p>
+    <p align="center"><input type="text" id="enteredTokenID" placeholder="Token ID"></p>
+    <p align="center"><button onclick="decodeTokenID()" style="font-size: 18px;">Decode</button></p>
+    <div id="decodedTokenIDs" style="font-size: 18px;"><br></div>
+    <br>
+    <p align="center">Note: if the tokenID was not generated from a string (e.g. it's the hash of something, or just a numeric ID for its own sake), the output here will be uninterpretable.
+  </div>
+  <p align="center" style="font-size: 24px;">Advanced Features</p>
+  <p align="center"><input type="checkbox" id="shouldIHash">Perform hash?
+    <br> At the end of the day, each token corresponds to a unique 256-bit value.  We can just as easily use a hashing function to produce the token ID, which allows arbitrarily sized inputs.  The full works of Shakespeare can be reduced to a single token, though changes in the ordering or even the addition an extra space at the end of a single sentence will change the hash.  Check this box to hash the input using the most commonly accepted SHA-256 algorithm, and use the hash as the token ID. For texts longer than a sentence (and certainly for anything other than text, like an mp3 or pdf), prefer hashing elsewhere and using the option below.</p>
+  <p align="center"><input type="checkbox" id="rawValue">Raw ID value?<br> If you hash elsewhere, or just want a particular number tokenID (e.g. 1000), check this box so that the value you enter is the token ID.  If the value starts with <code><mark>0x</mark></code>, it will be interpreted as hex, otherwise as decimal (base 10).</p>
+</div>
 <div style="clear: both;"></div>
-<!-- <div style="clear: both;"></div> -->
+
 <div align="center" class="centered2" style="height:200px;width:200px;">
   <img src="./misc_files/babelNFT.gif" style="width:70%"/>
 </div>
@@ -194,7 +205,7 @@ async function onCheckTextField() {
   tokenID = '0x' + web3.utils.padLeft(tokenID.replace('0x', ''), 64);
   backTranslation = new TextDecoder().decode(hexToBytes(tokenID));
   decimalTranslation = BigInt(tokenID).toString(10);
-  document.getElementById("tokenIDs").innerHTML = "Token ID: <code><mark>"+tokenID+"</code></mark><br>Decimal token ID: <code><mark>"+decimalTranslation+"</code></mark><br>And back: <code><mark>"+backTranslation+"</code></mark>";
+  document.getElementById("tokenIDs").innerHTML = "Token ID: <code><mark>"+tokenID+"</code></mark><br>Decimal token ID: <code><mark>"+decimalTranslation+"</code></mark>";
   try {
     myContract.methods.ownerOf(tokenID).call().then((returned) => {
       // It's already owned: display the owner
@@ -225,7 +236,20 @@ async function onCheckTextField() {
     window.alert("Really bad query: "+e.message);
     console.log(e.message);
   }}
-
+async function decodeTokenID() {
+  var enteredTokenID = document.getElementById("enteredTokenID").value;
+  try {
+    if (enteredTokenID.slice(0, 2) !== '0x') { // interpret as decimal
+      enteredTokenID = BigInt(enteredTokenID).toString(16);
+    }
+    enteredTokenID = '0x' + web3.utils.padLeft(enteredTokenID.replace('0x', ''), 64);
+    console.log(enteredTokenID);
+    backTranslation = new TextDecoder().decode(hexToBytes(enteredTokenID));
+    document.getElementById("decodedTokenIDs").innerHTML = "Decoded: <code><mark>"+backTranslation+"</code></mark>";
+  } catch (error) {
+    window.alert("Bad decode ID; "+error);
+  }
+}
 </script>
 </body>
 </html>
