@@ -194,7 +194,7 @@ async function onCheckTextField() {
   tokenID = '0x' + web3.utils.padLeft(tokenID.replace('0x', ''), 64);
   backTranslation = new TextDecoder().decode(hexToBytes(tokenID));
   decimalTranslation = BigInt(tokenID).toString(10);
-  document.getElementById("tokenIDs").innerHTML = "Token ID: <code><mark>"+tokenID+"</code></mark><br>And back: <code><mark>"+backTranslation+"</code></mark><br>Decimal token ID: <code><mark>"+decimalTranslation+"</code></mark>";
+  document.getElementById("tokenIDs").innerHTML = "Token ID: <code><mark>"+tokenID+"</code></mark><br>Decimal token ID: <code><mark>"+decimalTranslation+"</code></mark><br>And back: <code><mark>"+backTranslation+"</code></mark>";
   try {
     myContract.methods.ownerOf(tokenID).call().then((returned) => {
       // It's already owned: display the owner
