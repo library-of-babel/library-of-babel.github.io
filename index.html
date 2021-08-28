@@ -32,7 +32,7 @@
 <!-- Minting factory -->
 <div style="width:600px; height:600px" align="center" class="container">
   <p>&nbsp;</p>
-  <p align="center"><input type="text" id="text_entry" placeholder="Text"></input></p>
+  <p align="center"><input type="text" id="text_entry" placeholder="Text"></p>
   <p align="center"><button onclick="onCheckTextField()" style="font-size: 18px;">Check token status</button></p>
   <div id="tokenIDs"><br><br></div>
   <div align="center" style="margin:0 auto;width: 90%%">
@@ -63,13 +63,13 @@
       You and everyone else can see the record of this on <a href="https://etherscan.io/token/0x734b03a053c1153c4A77E80911C00ecE3c3D163E">Etherscan</a> (you can also search for your wallet address, or the contract address below). You can list it on an NFT auction place like <a href="https://opensea.io/collection/babelnft">OpenSea</a>, though currently (without metadata attached to these tokens) it's a little barebones.</p>
       <p><b>How is the tokenID produced?</b></p>
       <p>We use SHA-256 to hash (i.e. turn any input into a stupidly large, 256-bit number).  This means of serialization is commonly used to prove identity, because two distinct inputs will statistically never have the same hash (e.g. when file integrity is verified by checksum).  You can check the hash value on a variety of other websites; <b>the value in using this hash is that it is a universally agreed upon standard.</b>  It doesn't matter who hashes "New York City", you will always get <code><mark>0x5a59ef2e40c5f89adb8c0c6ad0a8019b0e252fff530cf2ee822880eac13599c3</mark></code>. <br>
-      <b><u>You and everyone else can verify that the token matches the input, but there is no way backward from the tokenID to the original input if it's forgotten. It's on you to keep track of your inputs, so that the tokens are more than meaningless strings of numbers.</b></u></p>
+      <b><u>You and everyone else can verify that the token matches the input, but there is no way backward from the tokenID to the original input if it's forgotten. It's on you to keep track of your inputs, so that the tokens are more than meaningless strings of numbers.</u></b></p>
       <p><b>What should I know about the possible inputs?</b></p>
       <p>SHA-256 can encode inputs much longer than 256 bits, meaning the entire works of Shakespeare can be hashed down to a single 256-bit identifier.  We don't recommend pasting the whole text in this webpage, however; you can hash whatever you want elsewhere, and check the "Already hashed?" box to indicate you want the ID as is.  Do so at your own risk; poorly formatted entries will throw errors.  Also it is important to note that "love", "Love", and "LOVE" will all produce different hashes, and will therefore correspond to different tokens.  SHA-256 works on byte streams, ultimately strings are turned into bytes through UTF-8.  Non-latin characters like €, 어이, and 🔥 are also fair game, as they have a universally agreed upon representation in bytes.</p>
       <p><b>Library of Babel...?</b></p>
       <p>A ridiculously cool idea of Jorge Luis Borges of a fictional library which contains every possible book up to 410 pages long, by having one book per distinct combination of letters and punctuation.  While the vast majority of the library is utter nonsense, lying in its shelves are also every book written and every book that will ever be written (within the page limit).  These NFTs are similar: there are 2<sup>256</sup>≈10<sup>77</sup> possible tokens to be minted, nearly as many as the estimated number of atoms in the universe (~10<sup>82</sup>).  The vast, vast majority will never be mined, and correspond to nothing interesting.  But within the space of all of these tokens, there is a unique link to every person and place that has ever existed, to every word in every language, and maybe even to every unique sentence that has ever been uttered? </p>
       <p><b>Contract address</b></p>
-      <p><code><mark>0x734b03a053c1153c4A77E80911C00ecE3c3D163E</code></mark></p>
+      <p><code><mark>0x734b03a053c1153c4A77E80911C00ecE3c3D163E</mark></code></p>
       <p></p>
     </div>
 </div>
@@ -205,7 +205,7 @@ async function onCheckTextField() {
   tokenID = '0x' + web3.utils.padLeft(tokenID.replace('0x', ''), 64);
   backTranslation = new TextDecoder().decode(hexToBytes(tokenID));
   decimalTranslation = BigInt(tokenID).toString(10);
-  document.getElementById("tokenIDs").innerHTML = "Token ID: <code><mark>"+tokenID+"</code></mark><br>Decimal token ID: <code><mark>"+decimalTranslation+"</code></mark>";
+  document.getElementById("tokenIDs").innerHTML = "Token ID: <code><mark>"+tokenID+"</mark></code><br>Decimal token ID: <code><mark>"+decimalTranslation+"</mark></code>";
   try {
     myContract.methods.ownerOf(tokenID).call().then((returned) => {
       // It's already owned: display the owner
@@ -245,7 +245,7 @@ async function decodeTokenID() {
     enteredTokenID = '0x' + web3.utils.padLeft(enteredTokenID.replace('0x', ''), 64);
     console.log(enteredTokenID);
     backTranslation = new TextDecoder().decode(hexToBytes(enteredTokenID));
-    document.getElementById("decodedTokenIDs").innerHTML = "Decoded: <code><mark>"+backTranslation+"</code></mark>";
+    document.getElementById("decodedTokenIDs").innerHTML = "Decoded: <code><mark>"+backTranslation+"</mark></code>";
   } catch (error) {
     window.alert("Bad decode ID; "+error);
   }

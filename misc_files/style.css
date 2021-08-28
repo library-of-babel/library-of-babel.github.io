@@ -59,6 +59,7 @@ input[type=text] {padding:5px;
   solid #ccc; 
   -webkit-border-radius: 5px;
   border-radius: 5px;
+  font-size: 22px;
 }
 
 .squiggle {
@@ -95,7 +96,8 @@ input[type=text] {padding:5px;
 }
 
 mark {
-  background-color: #cccccc;
+  background-color: #e0e1dd;
+  font-size: 18px;
 }
 
 a:link {
