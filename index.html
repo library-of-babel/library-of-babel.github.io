@@ -33,7 +33,7 @@
 <div style="width:600px; height:600px" align="center" class="container">
   <p>&nbsp;</p>
   <p align="center"><input type="text" id="text_entry" placeholder="Text"></p>
-  <p align="center"><button onclick="onCheckTextField()" style="font-size: 18px;">Retrieve token</button></p>
+  <p align="center"><button onclick="onCheckTextField()" style="font-size: 18px;">Look up token</button></p>
   <div id="tokenIDs"><br><br></div>
   <div align="center" style="margin:0 auto;width: 90%%">
     <div style="float:left; width: 250px; height: 400px; margin: 0 auto; transform: translate(40%, 0);" id="minted">
@@ -45,14 +45,15 @@
       <div id="unminted_text"> </div>
       <p align="center"><button type="button" id="walletConnectButton" style="visibility:hidden;font-size: 18px;" onclick="connectWallet()">Connect wallet</button></p>
       <p align="center"><button type="button" id="mintNFTButton" style="visibility:hidden;font-size: 18px;" onclick="mintTheNFT()">Mint NFT</button></p>
+      <p align="center" id="warningText"><br><br><br><br></p>
     </div>
   </div>
 </div>
 <div class="spacer"></div>
 
 <!-- FAQs -->
-<div class="container" style="width:600px; color: #bbb">
-    <div align="center" style="width:500px; margin: 0 auto">
+<div class="container" style="width:750px; color: #bbb">
+    <div align="center" style="width:750px; margin: 0 auto">
       <p><span class="title">What's going on here?</span></p>
       <p><b>Hey, where's my jpeg?</b></p>
       <p>This NFT is as minimal as you can get.  There is no associated metadata, no bells or whistles.  The token ID is etched into the Ethereum blockchain with your "name" beside it, and that's all you get.</p>
@@ -86,7 +87,7 @@
     <br>
     <p align="center">Note: if the tokenID was not generated from a piece of text (for example, it's the hash of something, or just a numeric ID for its own sake (see below)), the output here will be uninterpretable.
   </div>
-  <p align="center" style="font-size: 24px;">Advanced Features</p>
+  <p align="center" style="font-size: 24px;">Advanced Options for Token Lookup</p>
   <p align="center"><input type="checkbox" id="shouldIHash">Perform hash?
     <br> At the end of the day, each token corresponds to a unique 256-bit value.  We can just as easily use a hashing function to produce the token ID, which allows arbitrarily sized inputs.  The full works of Shakespeare can be reduced to a single ID and therefor a unique token, though changes in the ordering or even the addition an extra space at the end of a single sentence will change the hash.  Check this box to hash the input using the most commonly accepted SHA-256 algorithm, and use the hash as the token ID. For texts longer than a sentence (and certainly for anything other than text, like an mp3 or pdf), prefer hashing elsewhere and using the option below.  Won't there be collisions between the 32 byte textual tokens, and hash tokens?  No, due to the astronomical number of tokens possible.</p>
   <p align="center"><input type="checkbox" id="rawValue">Raw ID value?<br> If you hash elsewhere, or just want a particular number tokenID (e.g. the number 1000), check this box so that the value you enter is the token ID.  If the value starts with <code><mark>0x</mark></code>, it will be interpreted as hex, otherwise as decimal (base 10).</p>
@@ -173,6 +174,8 @@ function hexToBytes(hex) {
     return new Uint8Array(bytes);
 }
 function mintTheNFT() {
+  document.getElementById("warningText").innerHTML = "The minting transaction can take up to a few minutes; do not try to mint the same token again in this timeframe, or else the processing fee will be lost.";
+  document.getElementById("warningText").style['background'] = "#296eb4";
   const data = myContract.methods.mintNFT(publicKey, tokenID).encodeABI();
   const tx = {
    'from': publicKey,
