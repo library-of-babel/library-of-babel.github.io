@@ -34,7 +34,7 @@
   <p>&nbsp;</p>
   <p align="center"><input type="text" id="text_entry" placeholder="Text"></p>
   <p align="center"><button onclick="onCheckTextField()" style="font-size: 18px;">Look up token</button></p>
-  <div id="tokenIDs"><br><br></div>
+  <div id="tokenIDs"><br><br><br></div>
   <div align="center" style="margin:0 auto;width: 90%%">
     <div style="float:left; width: 250px; height: 400px; margin: 0 auto; transform: translate(40%, 0);" id="minted">
       <img src="./misc_files/arrowdl.svg" id="lefty" style="width:70%"/>
@@ -80,7 +80,7 @@
 <div style="width:600px;" align="center" class="container">
   <div align="center">
     <br>
-    <p align="center" style="font-size: 24px">Turn a token ID back into the characters it represents</p>
+    <p align="center" style="font-size: 24px">Turn a token ID back into the text it represents</p>
     <p align="center"><input type="text" id="enteredTokenID" placeholder="Token ID"></p>
     <p align="center"><button onclick="decodeTokenID()" style="font-size: 18px;">Decode</button></p>
     <div id="decodedTokenIDs" style="font-size: 18px;"><br></div>
@@ -211,7 +211,7 @@ async function onCheckTextField() {
   tokenID = '0x' + web3.utils.padLeft(tokenID.replace('0x', ''), 64);
   backTranslation = new TextDecoder().decode(hexToBytes(tokenID));
   decimalTranslation = BigInt(tokenID).toString(10);
-  document.getElementById("tokenIDs").innerHTML = "Token ID: <code><mark>"+decimalTranslation+"</mark></code><br>Hex: <code><mark>"+tokenID+"</mark></code>";
+  document.getElementById("tokenIDs").innerHTML = "Token ID: <code><mark>"+decimalTranslation+"</mark></code><br>Hex: <code><mark>"+tokenID+"</mark></code><br>Text decoded: <code><mark>"+backTranslation+"</mark></code>";
   try {
     myContract.methods.ownerOf(tokenID).call().then((returned) => {
       // It's already owned: display the owner
@@ -221,6 +221,7 @@ async function onCheckTextField() {
       document.getElementById("unminted_text").innerHTML = "";
       document.getElementById("walletConnectButton").style.visibility = "hidden";
       document.getElementById("mintNFTButton").style.visibility = "hidden";
+      document.getElementById("warningText").innerHTML = "<br><br><br><br>";
     }).catch(error => {
       console.log(error.message);
       if (error.message.includes("nonexistent token")) {
