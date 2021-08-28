@@ -33,7 +33,6 @@
 <div style="width:600px; height:600px" align="center" class="container">
   <p>&nbsp;</p>
   <p align="center"><input type="text" id="text_entry" placeholder="Text"></input></p>
-  <p align="center"><input type="checkbox" id="alreadyHashed">Is this already a hash of something?</p>
   <p align="center"><button onclick="onCheckTextField()" style="font-size: 18px;">Check token status</button></p>
   <div id="tokenIDs"><br><br></div>
   <div align="center" style="margin:0 auto;width: 90%%">
@@ -74,6 +73,11 @@
       <p></p>
     </div>
 </div>
+<div style="width:600px; height:600px" align="center" class="container">
+  <p>Advanced Features</p>
+  <p align="center"><input type="checkbox" id="shouldIHash">Perform hash?</p>
+  <p align="center"><input type="checkbox" id="rawID">Raw ID value?</p>
+<div style="clear: both;"></div>
 <!-- <div style="clear: both;"></div> -->
 <div align="center" class="centered2" style="height:200px;width:200px;">
   <img src="./misc_files/babelNFT.gif" style="width:70%"/>
@@ -81,7 +85,7 @@
 <script type="text/javascript">
 
 let textField;
-let hashedTextField;
+let tokenID;
 let publicKey;
 let walletConnected = false;
 let myContract;
@@ -94,7 +98,6 @@ const contractABI = [{"inputs": [],"stateMutability": "nonpayable","type": "cons
 API_URL = "https://eth-mainnet.alchemyapi.io/v2/aNuJmwSx78k2fZoMSPQB5lZ90jmGBhgc";
 const web3 = AlchemyWeb3.createAlchemyWeb3(API_URL)
 myContract = new web3.eth.Contract(contractABI, contractAddress);
-
 
 async function connectWallet () {
   if (typeof window.ethereum !== 'undefined') { //check if Metamask is installed
@@ -131,33 +134,32 @@ async function requestApproval() {
   }
   }
 }
-
-async function hashMessage() { // Prefer hashing here to save on gas
-  const encoder = new TextEncoder();
-  const data = encoder.encode(textField);
-  const hash = await crypto.subtle.digest('SHA-256', data);
-  hashedTextField = hex(hash);
+async function hashMessage() {
+  tokenID = hex(await crypto.subtle.digest('SHA-256', tokenID));
 }
-const byteToHex = [];
 
+const byteToHex = [];
 for (let n = 0; n <= 0xff; ++n)
 {
     const hexOctet = n.toString(16).padStart(2, "0");
     byteToHex.push(hexOctet);
 }
-
 function hex(arrayBuffer) {
     const buff = new Uint8Array(arrayBuffer);
-    const hexOctets = []; // new Array(buff.length) is even faster (preallocates necessary array size), then use hexOctets[i] instead of .push()
-
+    const hexOctets = [];
     for (let i = 0; i < buff.length; ++i)
         hexOctets.push(byteToHex[buff[i]]);
 
     return "0x"+hexOctets.join("");
 }
-
+function hexToBytes(hex) {
+  // starting at 2 skips over the 0x
+    for (var bytes = [], c = 2; c < hex.length; c += 2)
+    bytes.push(parseInt(hex.substr(c, 2), 16));
+    return new Uint8Array(bytes);
+}
 function mintTheNFT() {
-  const data = myContract.methods.mintNFT(publicKey, hashedTextField).encodeABI();
+  const data = myContract.methods.mintNFT(publicKey, tokenID).encodeABI();
   const tx = {
    'from': publicKey,
    'to': contractAddress,
@@ -166,32 +168,39 @@ function mintTheNFT() {
    'data': data,
   };
   console.log("Data", data);
-
   const txHash = ethereum.request({method: 'eth_sendTransaction', params: [tx]}).then((hash) => {
     console.log("The hash of your transaction is: ", hash);
   }).catch((err) => {
       console.log("Something went wrong when submitting your transaction:", err);
     })
 }
-
 async function onCheckTextField() {
-
   textField = document.getElementById("text_entry").value;
   console.log(textField);
-  if (document.getElementById("alreadyHashed").checked) {
-    hashedTextField = textField;
+  if (document.getElementById("rawID").checked) {
+    if (textField.slice(0, 2) == '0x') { // interpret as hex
+      tokenID = textField;
+    } else { // interpret as decimal
+      tokenID = BigInt(textField).toString(16);
+    }
   } else {
-    await hashMessage();
+    tokenID = new TextEncoder().encode(textField);
+    if (document.getElementById("shouldIHash").checked) {
+      await hashMessage();
+    } else {
+      tokenID = hex(tokenID);
+    }
   }
-  hashedTextField = '0x' + web3.utils.padLeft(hashedTextField.replace('0x', ''), 64);
-  document.getElementById("tokenIDs").innerHTML = "Token ID: <code><mark>"+hashedTextField+"</code></mark>";
-  console.log(hashedTextField);
+  tokenID = '0x' + web3.utils.padLeft(tokenID.replace('0x', ''), 64);
+  backTranslation = new TextDecoder().decode(hexToBytes(tokenID));
+  decimalTranslation = BigInt(tokenID).toString(10);
+  document.getElementById("tokenIDs").innerHTML = "Token ID: <code><mark>"+tokenID+"</code></mark><br>And back: <code><mark>"+backTranslation+"</code></mark><br>Decimal token ID: <code><mark>"+decimalTranslation+"</code></mark>";
   try {
-    myContract.methods.ownerOf(hashedTextField).call().then((thing) => {
+    myContract.methods.ownerOf(tokenID).call().then((returned) => {
       // It's already owned: display the owner
       document.getElementById("lefty").style.filter = "invert(0.9)";
       document.getElementById("righty").style.filter = "";
-      document.getElementById("minted_text").innerHTML = "Already minted!  Belongs to: <br> <code><mark>"+thing+"</mark></code>";
+      document.getElementById("minted_text").innerHTML = "Already minted!  Belongs to: <br> <code><mark>"+returned+"</mark></code>";
       document.getElementById("unminted_text").innerHTML = "";
       document.getElementById("walletConnectButton").style.visibility = "hidden";
       document.getElementById("mintNFTButton").style.visibility = "hidden";
