@@ -174,7 +174,7 @@ function hexToBytes(hex) {
     return new Uint8Array(bytes);
 }
 function mintTheNFT() {
-  document.getElementById("warningText").innerHTML = "The minting transaction can take up to a few minutes; do not try to mint the same token again in this timeframe, or else the processing fee will be lost.";
+  document.getElementById("warningText").innerHTML = "Do not try to mint the same token again! The minting transaction can take up to a few minutes, and the processing fee will be lost if you send multiple transactions for the same token.";
   document.getElementById("warningText").style['background'] = "#296eb4";
   const data = myContract.methods.mintNFT(publicKey, tokenID).encodeABI();
   const tx = {
@@ -222,6 +222,7 @@ async function onCheckTextField() {
       document.getElementById("walletConnectButton").style.visibility = "hidden";
       document.getElementById("mintNFTButton").style.visibility = "hidden";
       document.getElementById("warningText").innerHTML = "<br><br><br><br>";
+      document.getElementById("warningText").style['background'] = "#00000000";
     }).catch(error => {
       console.log(error.message);
       if (error.message.includes("nonexistent token")) {
