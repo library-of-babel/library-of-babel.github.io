@@ -120,8 +120,8 @@ const contractABI = [{"inputs": [],"stateMutability": "nonpayable","type": "cons
     }
   ],
 
-
-const web3 = AlchemyWeb3.createAlchemyWeb3("https://eth-mainnet.alchemyapi.io/v2/aNuJmwSx78k2fZoMSPQB5lZ90jmGBhgc");
+API_URL = "https://eth-mainnet.alchemyapi.io/v2/aNuJmwSx78k2fZoMSPQB5lZ90jmGBhgc";
+const web3 = AlchemyWeb3.createAlchemyWeb3(API_URL);
 myContract = new web3.eth.Contract(contractABI, contractAddress);
 
 async function connectWallet () {
@@ -286,8 +286,6 @@ function loadRecentMints () {
       }
     });
   });
-  
-  
 }
 loadRecentMints();
 </script>
