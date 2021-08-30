@@ -1,6 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <!-- saved from url=(0034)https://mannequin-depth.github.io/ -->
 <script src="https://cdn.jsdelivr.net/npm/@alch/alchemy-web3@latest/dist/alchemyWeb3.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.2/axios.min.js"></script>
 <html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link href="./misc_files/style.css" rel="stylesheet" type="text/css">
 <!-- Global site tag (gtag.js) - Google Analytics -->
@@ -15,7 +16,7 @@
 <body>
 
 <!-- Header -->
-<div class="container" style="height:600px; width:600px; color: #eee">
+<div class="container" style="height:600px; width:600px; color: #eee; margin: auto">
     <img class="squiggle" src="./misc_files/squiggle1.svg" id="squiggy1" style="width:85%; transform: translate(-53%, -50%);"/>
     <div class="centered" style="width:300px">
       <p><span class="title">Welcome to the NFT Library of Babel</span></p>
@@ -30,25 +31,34 @@
     </div>
 </div>
 <!-- Minting factory -->
-<div style="width:600px; height:600px" align="center" class="container">
-  <p>&nbsp;</p>
-  <p align="center"><input type="text" id="text_entry" placeholder="Text"></p>
-  <p align="center"><button onclick="onCheckTextField()" style="font-size: 18px;">Look up token</button></p>
-  <div id="tokenIDs"><br><br><br></div>
-  <div align="center" style="margin:0 auto;width: 90%%">
-    <div style="float:left; width: 250px; height: 400px; margin: 0 auto; transform: translate(40%, 0);" id="minted">
-      <img src="./misc_files/arrowdl.svg" id="lefty" style="width:70%"/>
-      <div id="minted_text"> </div>
-    </div>
-    <div style="float:right; width: 250px; height: 400px; margin: 0 auto" id="unminted">
-      <img src="./misc_files/arrowdr.svg" id="righty" style="width:70%; transform: translate(-50%, 0);"/>
-      <div id="unminted_text"> </div>
-      <p align="center"><button type="button" id="walletConnectButton" style="visibility:hidden;font-size: 18px;" onclick="connectWallet()">Connect wallet</button></p>
-      <p align="center"><button type="button" id="mintNFTButton" style="visibility:hidden;font-size: 18px;" onclick="mintTheNFT()">Mint NFT</button></p>
-      <p align="center" id="warningText"><br><br><br><br></p>
+<div class="container" style="margin: auto;width:1000px; height: 600px">
+  <div class="container" style="width: 200px; float: left;">
+  </div>
+
+  <div style="width:600px; height:600px" align="center" class="container">
+    <p>&nbsp;</p>
+    <p align="center"><input type="text" id="text_entry" placeholder="Text"></p>
+    <p align="center"><button onclick="onCheckTextField()" style="font-size: 18px;">Look up token</button></p>
+    <div id="tokenIDs"><br><br><br><br></div>
+    <div align="center" style="margin:0 auto;width: 90%%">
+      <div style="float:left; width: 250px; height: 400px; margin: 0 auto; transform: translate(40%, 0);" id="minted">
+        <img src="./misc_files/arrowdl.svg" id="lefty" style="width:70%"/>
+        <div id="minted_text"> </div>
+      </div>
+      <div style="float:right; width: 250px; height: 400px; margin: 0 auto" id="unminted">
+        <img src="./misc_files/arrowdr.svg" id="righty" style="width:70%; transform: translate(-50%, 0);"/>
+        <div id="unminted_text"> </div>
+        <p align="center"><button type="button" id="walletConnectButton" style="visibility:hidden;font-size: 18px;" onclick="connectWallet()">Connect wallet</button></p>
+        <p align="center"><button type="button" id="mintNFTButton" style="visibility:hidden;font-size: 18px;" onclick="mintTheNFT()">Mint NFT</button></p>
+        <p align="center" id="warningText"><br><br><br><br></p>
+      </div>
     </div>
   </div>
+
+  <div class="container" id="recentMints" style="width:200px;float: left; text-align: right;">
+  </div>
 </div>
+
 <div class="spacer"></div>
 
 <!-- FAQs -->
@@ -110,8 +120,8 @@ const contractABI = [{"inputs": [],"stateMutability": "nonpayable","type": "cons
     }
   ],
 
-API_URL = "https://eth-mainnet.alchemyapi.io/v2/aNuJmwSx78k2fZoMSPQB5lZ90jmGBhgc";
-const web3 = AlchemyWeb3.createAlchemyWeb3(API_URL)
+
+const web3 = AlchemyWeb3.createAlchemyWeb3("https://eth-mainnet.alchemyapi.io/v2/aNuJmwSx78k2fZoMSPQB5lZ90jmGBhgc");
 myContract = new web3.eth.Contract(contractABI, contractAddress);
 
 async function connectWallet () {
@@ -258,6 +268,29 @@ async function decodeTokenID() {
     window.alert("Bad decode ID; "+error);
   }
 }
+function loadRecentMints () {
+  const startBlock = 13115614;
+  var URL = `https://api.etherscan.io/api?module=proxy&action=eth_blockNumber&apikey=V15KRMFFIUXH3R3CFQZ8DH3B478CUQHZP4`
+  axios.get(URL).then(response => {
+    const endBlock = response.data.result;
+    console.log(endBlock);
+    URL = `https://api.etherscan.io/api?module=account&action=txlist&address=${contractAddress}&startblock=${startBlock}&endblock=${endBlock}&sort=desc&apikey=V15KRMFFIUXH3R3CFQZ8DH3B478CUQHZP4`
+    axios.get(URL).then(response => {
+      console.log(response);
+      const stuff = response.data.result;
+      document.getElementById("recentMints").innerHTML = '<p style="font-size: 20px;">Recent Mints</p>';
+
+      for (let i = 0; i < 10; ++i) {
+        var mintedTokenID = stuff[i].input.slice(-66);
+        mintedTokenID = new TextDecoder().decode(hexToBytes(mintedTokenID))
+        document.getElementById("recentMints").innerHTML += '<mark><code>'+mintedTokenID+'</code></mark><br>';
+      }
+    });
+  });
+  
+  
+}
+loadRecentMints();
 </script>
 </body>
 </html>
